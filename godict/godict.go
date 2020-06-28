@@ -13,14 +13,11 @@ import (
 // Dict : Dictionnary of anything type
 type Dict map[interface{}]interface{}
 
-// Array : Array of anything type
-type Array []interface{}
-
 func merge(a interface{}, b interface{}) (interface{}, error) {
 	switch x := a.(type) {
 	case Dict:
 		return mergeDict(x, b)
-	case Array:
+	case []interface{}:
 		return mergeArray(x, b)
 	default:
 		return a, nil
@@ -57,13 +54,14 @@ func mergeDict(a Dict, b ...interface{}) (Dict, error) {
 	return ret, nil
 }
 
-func mergeArray(a Array, b ...interface{}) (Array, error) {
+func mergeArray(a []interface{}, b ...interface{}) ([]interface{}, error) {
 	retlen := len(a)
 
 	// Pre-process b to compute len
 	for _, bi := range b {
-		ab := bi.(Array)
-		if ab == nil {
+		ab, ok := bi.([]interface{})
+		if !ok {
+			//TODO : add flag to accept this situation depending on priority (eg strict mode)
 			return nil, fmt.Errorf("Array element expected during merging Array")
 		}
 		retlen += len(ab)
@@ -76,7 +74,7 @@ func mergeArray(a Array, b ...interface{}) (Array, error) {
 	offset := len(a)
 
 	for _, bi := range b {
-		ab := bi.(Array)
+		ab := bi.([]interface{})
 		for i, v := range ab {
 			ret[offset+i] = v
 		}
@@ -146,9 +144,19 @@ func (d Dict) ExtractFromXPath(path string) (interface{}, error) {
 	for {
 		switch x := node.(type) {
 		case Dict:
-			node = x[head]
-		case Array:
-			index, _ := strconv.Atoi(head)
+			var ok bool
+			node, ok = x[head]
+			if !ok {
+				return nil, fmt.Errorf("Element %s doesn't exist", head)
+			}
+		case []interface{}:
+			index, err := strconv.Atoi(head)
+			if err != nil {
+				return nil, err
+			}
+			if index < 0 || index >= len(x) {
+				return nil, fmt.Errorf("Index %d is out of array boundaries [0,%d]", index, len(x))
+			}
 			node = x[index]
 		default:
 			return nil, fmt.Errorf("can't interprete token %s at type: %v", head, x)

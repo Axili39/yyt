@@ -1,0 +1,8 @@
+---
+version: "1.0"
+object:
+  member3: D
+  member5: E
+  array:
+    - item6
+    - item7

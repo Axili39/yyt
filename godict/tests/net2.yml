@@ -1,8 +1,8 @@
 ---
 version: "1.0"
 object:
-  member1: A
-  member2: B
+  member3: A
+  member4: B
   array:
     - item1
     - item2
