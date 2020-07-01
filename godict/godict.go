@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Dict : Dictionnary of anything type
+// Dict : Dictionary of anything type
 type Dict map[interface{}]interface{}
 
 func merge(a interface{}, b interface{}) (interface{}, error) {
@@ -68,9 +68,10 @@ func mergeArray(a []interface{}, b ...interface{}) ([]interface{}, error) {
 	}
 	// create Array
 	ret := make([]interface{}, retlen)
-	for i, v := range a {
-		ret[i] = v
-	}
+	//for i, v := range a {
+	//	ret[i] = v
+	//}
+	copy(ret, a)
 	offset := len(a)
 
 	for _, bi := range b {
@@ -97,7 +98,7 @@ func Merge(a Dict, b Dict) (Dict, error) {
 	return mergeDict(a, b)
 }
 
-// LoadFromYamlFiles : Load dictionnary from YAML encoded files
+// LoadFromYamlFiles : Load dictionary from YAML encoded files
 func LoadFromYamlFiles(filenames []string) (Dict, error) {
 	var data Dict
 	for _, f := range filenames {

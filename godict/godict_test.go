@@ -1,7 +1,6 @@
 package godict
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -88,19 +87,19 @@ func TestExtractFromXPath(t *testing.T) {
 	}
 
 	// unexisting node extraction
-	node, err = d.ExtractFromXPath("object/member3")
+	_, err = d.ExtractFromXPath("object/member3")
 	if err == nil {
 		t.Errorf("Unexisting node extraction must return an error")
 	}
 
 	// out of bounds array element extraction
-	node, err = d.ExtractFromXPath("object/array/56")
+	_, err = d.ExtractFromXPath("object/array/56")
 	if err == nil {
 		t.Errorf("Unexisting node extraction from array must return an error")
 	}
 
 	// bad array element index
-	node, err = d.ExtractFromXPath("object/array/xyz")
+	_, err = d.ExtractFromXPath("object/array/xyz")
 	if err == nil {
 		t.Errorf("Bad node extraction from array must return an error")
 	}
@@ -119,7 +118,7 @@ func TestMerge(t *testing.T) {
 
 	d, err := Merge(d1, d2)
 	if err != nil {
-		fmt.Errorf("Unexpected error during nominal merge : %v", err)
+		t.Errorf("Unexpected error during nominal merge : %v", err)
 	}
 
 	// check d content
@@ -160,7 +159,7 @@ func TestUnMergable(t *testing.T) {
 
 	_, err = Merge(d1, d2)
 	if err == nil {
-		fmt.Errorf("Missing error when merging uncomptatible datas")
+		t.Errorf("Missing error when merging uncomptatible datas")
 	}
 }
 
@@ -168,7 +167,7 @@ func TestLoad(t *testing.T) {
 	filenames := []string{"tests/net1.yml", "tests/net2.yml", "tests/net3.yml"}
 	_, err := LoadFromYamlFiles(filenames)
 	if err != nil {
-		fmt.Errorf("Unexpected error during nominal load : %v", err)
+		t.Errorf("Unexpected error during nominal load : %v", err)
 	}
 
 }
