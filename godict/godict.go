@@ -1,6 +1,7 @@
 package godict
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path"
@@ -125,6 +126,34 @@ func (d *Dict) FromYamlData(data []byte) error {
 // ToYamlData : Marshal Dict into data
 func (d *Dict) ToYamlData() ([]byte, error) {
 	return yaml.Marshal(d)
+}
+
+func Y2JConvert(i interface{}) interface{} {
+	switch x := i.(type) {
+	case map[interface{}]interface{}:
+		m2 := map[string]interface{}{}
+		for k, v := range x {
+			m2[k.(string)] = Y2JConvert(v)
+		}
+		return m2
+	case []interface{}:
+		for i, v := range x {
+			x[i] = Y2JConvert(v)
+		}
+	case Dict:
+		m2 := map[string]interface{}{}
+		for k, v := range x {
+			m2[k.(string)] = Y2JConvert(v)
+		}
+		return m2
+	}
+	return i
+}
+
+// ToJsonData : Marshal Dict into data
+func (d *Dict) ToJsonData() ([]byte, error) {
+	j := Y2JConvert(*d)
+	return json.Marshal(j)
 }
 
 // Path Management

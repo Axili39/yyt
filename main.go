@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -95,6 +96,7 @@ func main() {
 	nodePath := flag.String("node", "", "path to node to do action")
 	out := flag.String("out", "", "output file")
 	showVersion := flag.Bool("version", false, "Show version")
+	outformat := flag.String("out-format", "yaml", "Output format")
 
 	flag.Parse()
 	files := flag.Args()
@@ -121,13 +123,20 @@ func main() {
 	processTemplate(node, *exec, *execFile, output)
 
 	// Marshal to yaml if necessary
-	data, _ := yaml.Marshal(node)
-	_, err := output.WriteString("---\n")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "i/o error")
-		os.Exit(1)
+	var data []byte
+	switch *outformat {
+	case "yaml":
+		data, _ = yaml.Marshal(node)
+		_, err := output.WriteString("---\n")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "i/o error")
+			os.Exit(1)
+		}
+	case "json":
+		data, _ = json.Marshal(godict.Y2JConvert(node))
 	}
-	_, err = output.Write(data)
+
+	_, err := output.Write(data)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "i/o error")
 		os.Exit(1)
