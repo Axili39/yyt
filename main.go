@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"text/template"
 
@@ -85,7 +86,10 @@ func processTemplate(node interface{}, exec string, execFile string, output io.W
 	}
 
 	if execFile != "" {
-		//TODO
+		data, err := ioutil.ReadFile(execFile)
+		if err == nil {
+			runTemplate(node, string(data), output)
+		}
 		os.Exit(0)
 	}
 }
